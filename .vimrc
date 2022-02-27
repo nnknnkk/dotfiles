@@ -82,7 +82,7 @@ set helplang=ja
 "set ambiwidth=double
 set display=lastline
 set wildmode=list:longest,list:full
-set completeopt=preview,menuone
+set completeopt=preview,menuone,noinsert
 set complete=.,w,b,u,k,i,t
 
 set lazyredraw
@@ -240,6 +240,11 @@ tnoremap <S-ins> <C-w>"+
 " tnoremap <Esc> <C-\><C-n>
 " nnoremap <F2> <ESC>i<C-R>=strftime("[%Y.%m.%d %a %H:%M]")<CR><ESC>
 " nnoremap <F3> <ESC>i<C-R>=strftime("%H:%M")<CR><ESC>
+
+" VSCode風の補完 set completeopt=menuone,noinsert との組合せ
+inoremap <expr><CR>    pumvisible() ? "\<C-y>"  : "\<CR>"
+inoremap <expr><C-n>   pumvisible() ? "\<Down>" : "\<C-n>"
+inoremap <expr><C-p>   pumvisible() ? "\<Up>"   : "\<C-p>"
 
 " ======= }}}
 
