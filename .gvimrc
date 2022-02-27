@@ -1,8 +1,4 @@
 scriptencoding utf-8
-" gvimrc
-" set columns=100
-" set lines=30
-" colorscheme torte-cs
 
 " set guifont=Andale_Mono:h9:cSHIFTJIS
 " set guifont=ＤＦパブリW5D:h12:cSHIFTJIS
@@ -30,32 +26,13 @@ endif
 set listchars=eol:/,tab::.
 set list
 set number
-" set number relativenumber
 set signcolumn=yes
 set guioptions=cmgt!
 set foldcolumn=1
-" set cmdheight=2 foldcolumn=2
 
-" au GUIEnter * simalt ~x
-" au GUIEnter * set notitle
-
-" カラースキーム
-" ==========================================================
-" if expand("$USERDOMAIN")=="DISTAL"
-"     " colorscheme desert-cs
-"     colorscheme codedark
-"     set linespace=4 guifont=MeiryoKe_Console:h12:cSHIFTJIS
-" elseif has('win32')
-"     " colorscheme torte-cs
-"     " colorscheme desert-cs
-"     colorscheme codedark
-" endif
 colorscheme codedark
+" colorscheme torte-cs
 
 " 現在のタブに下線を引く
 highlight TabLineSel gui=underline
-" SKKの変換時に色と下線を付ける
-" highlight default skk_henkan ctermbg=1 ctermfg=15 guifg=#80a0ff gui=underline
-" highlight default skk_henkan ctermbg=1 ctermfg=15 gui=underline
-" let g:skk_use_face = 1
 

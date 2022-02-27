@@ -25,8 +25,8 @@ scriptencoding utf-8
 
 " ======= コンソール端末のカラースキーム ======= {{{
 if !has('gui_running')
-    colorscheme desert-cs
-" colorscheme codedark " ここで読み込むとエラー
+    " colorscheme desert-cs
+    autocmd VimEnter * colorscheme codedark
 endif
 " ======= }}}
 
@@ -105,7 +105,9 @@ set nospell  " z= で修正候補一覧
 set spelllang=en_us,cjk
 
 " 不要なメニューの削除
-autocmd VimEnter * aunmenu Syntax
+if has('gui_running')
+    autocmd VimEnter * aunmenu Syntax
+endif
 
 " markdownモードのコードブロックでハイライトする言語
 let g:markdown_fenced_languages = ['javascript','python','json']
@@ -135,7 +137,16 @@ endif
 " ======= ステータスライン ======= {{{
 "
 " set statusline=%<%#Search#%f%*\ B:%n%=\ u+%B\ %{SkkGetModeStr()}\ %m%r%h%w\ %12(行%-04.4l\ 列%-03v%)\ %{(&fenc!=''?&fenc:&enc).((&bomb)?'^':'\ ').&ff}
-set statusline=%<%f%*\ %M\ B:%n%=\ u+%B\ %{SkkGetModeStr()}\ %r%h%w%y\ %12(行%-04.4l\ 列%-03v%)\ %{(&fenc!=''?&fenc:&enc).((&bomb)?'^':'\ ').&ff}
+set statusline=%<%f%*\ %M\ B:%n
+set statusline+=\ %{SkkGetModeStr()}
+set statusline+=%=
+" if &enc =~ "^u"
+"     set statusline+=\ u+%B
+" else
+"     set statusline+=\ 0x%B
+" endif
+set statusline+=\ %{get(g:,'coc_git_status','')}
+set statusline+=\ %r%h%w%y\ %12(行%-04.4l\ 列%-03v%)\ %{(&fenc!=''?&fenc:&enc).((&bomb)?'^':'\ ').&ff}
 set statusline^=%{CocStatusDiagnostic()}
 
 " SKK利用時(ALE)
@@ -601,10 +612,15 @@ augroup END
 " ======= }}}
 
 " ======= プラグイン管理(vim-plug) ================= {{{
-let s:config_dir = expand('~/dotfiles/vimconf/')
-" PlugInstall!
-" PlugUpdate!
-"
+" 自動インストール
+let s:vim_plug_path = '~/vimfiles/autoload/plug.vim'
+if empty(glob(s:vim_plug_path))
+    echo "vim-plugを配置します"
+    silent execute '!curl -fLo '.s:vim_plug_path.' --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+
 call plug#begin('~/.local/share/plugged')
 
 " 日本語Help
@@ -637,7 +653,6 @@ Plug 'justinmk/vim-dirvish'
 " ウィンドウを閉じない:bdの代替コマンド
 " :BDなど :bdと入れ替えるにはvim-altercmdが必要
 " Plug 'qpkorr/vim-bufkill'
-" :Sayonara
 Plug 'mhinz/vim-sayonara'
 
 " 複雑なアライン
@@ -686,7 +701,10 @@ Plug 'easymotion/vim-easymotion'
 " テキストオブジェクトに対する置換
 Plug 'kana/vim-operator-user'
 Plug 'kana/vim-operator-replace'
-Plug 'tyru/operator-camelize.vim'
+
+" ケース変換
+" Plug 'tyru/operator-camelize.vim'
+Plug 'arthurxavierx/vim-caser'
 
 " マルチカーソル
 Plug 'mg979/vim-visual-multi'
@@ -698,6 +716,10 @@ Plug 'skanehira/translate.vim'
 Plug 'markonm/traces.vim'
 
 call plug#end()
+
+" 分割した設定ファイル
+let s:config_dir = expand('~/dotfiles/vimconf/')
+
 " ======= }}}
 
 " ======= skk.vim(外部設定) ======= {{{
@@ -950,9 +972,9 @@ autocmd User EasyMotionPromptBegin silent! CocDisable
 autocmd User EasyMotionPromptEnd   silent! CocEnable
 autocmd VimEnter * EMCommandLineNoreMap ; <CR>
 autocmd VimEnter * EMCommandLineNoreMap <Space> <CR>
-nmap g/ <Plug>(easymotion-sn)
-xmap g/ <Plug>(easymotion-sn)
-omap g/ <Plug>(easymotion-tn)
+nmap s/ <Plug>(easymotion-sn)
+xmap s/ <Plug>(easymotion-sn)
+omap s/ <Plug>(easymotion-tn)
 nmap ss <Plug>(easymotion-overwin-f2)
 nmap sl <Plug>(easymotion-overwin-line)
 " bd=Bidirectional w=wordの先頭 e=wordの末尾
@@ -971,9 +993,9 @@ nmap sl <Plug>(easymotion-overwin-line)
 " map    <Leader>n   <Plug>(easymotion-next)
 " map    <Leader>N   <Plug>(easymotion-prev)
 " map    <Leader>r   <Plug>(easymotion-repeat)
-amenu   Misc(&M).画面内を2打+ラベルで移動<TAB>ss       <Plug>(easymotion-overwin-f2)
-amenu   Misc(&M).画面内の行にラベルで移動<TAB>sl       <Plug>(easymotion-overwin-line)
-amenu   Misc(&M).画面内を検索してラベルで移動<TAB>g/       <Plug>(easymotion-sn)
+amenu   Misc(&M).画面内を2打+ラベルで移動<TAB>ss             <Plug>(easymotion-overwin-f2)
+amenu   Misc(&M).画面内の行にラベルで移動<TAB>sl             <Plug>(easymotion-overwin-line)
+amenu   Misc(&M).画面内を検索してラベルで移動<TAB>s/         <Plug>(easymotion-sn)
 amenu   Misc(&M).easymotion.easymotion-overwin-w<TAB>        <Plug>(easymotion-overwin-w)
 amenu   Misc(&M).easymotion.easymotion-overwin-line<TAB>     <Plug>(easymotion-overwin-line)
 amenu   Misc(&M).easymotion.easymotion-overwin-f<TAB>        <Plug>(easymotion-overwin-f)
@@ -1003,14 +1025,30 @@ amenu   Misc(&M).easymotion.easymotion-jumptoanywhere<TAB>   <Plug>(easymotion-j
 amenu   Misc(&M).カーソル位置の単語でマルチカーソル<TAB>^n ^n
 amenu   Misc(&M).上にカーソルを追加<TAB>^↑ <nop>
 amenu   Misc(&M).下にカーソルを追加<TAB>^↓ <nop>
+" let g:VM_user_operators = ['sa', 'sd', {'sr': 2}, 'si']
+" TAB   マルチカーソルとマルチカーソルヴィジュアルをトグル
 " n  N  次・前のハイライトを選択
-" [  ]  次・前のカーソルを選択
 " q     現在のハイライトをスキップして次を選択
 " Q     現在のハイライト、カーソルを削除
+" [  ]  次・前のカーソルを選択
+" \\a   ビジュアル選択をマルチカーソルビジュアルに変換
+" s<op> テキストオブジェクトを選択
+" .     直前の編集動作を繰り返す
+" \\@   マクロを適用する
+" \\z   :normal
+" \\x   ex
 
 " operator-camelize
-map scc <Plug>(operator-camelize-toggle)
-amenu   Misc(&M).キャメルケース変換 scc
+" map scc <Plug>(operator-camelize-toggle)
+let g:caser_prefix = 'sc'
+amenu   Misc(&M).キャメルケース scc
+amenu   Misc(&M).スネークケース sc_
+amenu   Misc(&M).パスカルケース scp
+amenu   Misc(&M).ケバブケース   sck
+
+" vim-sayonara
+let g:sayonara_confirm_quit = 1
+command! BD Sayonara!
 
 "<C-@> で :terminal もしくは Terminal ウィンドウにジャンプ
 if has('terminal')

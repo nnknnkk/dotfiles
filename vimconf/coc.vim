@@ -167,10 +167,27 @@ nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list.
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 
+nmap <leader>rf <Plug>(coc-refactor)
+nnoremap <silent><nowait> <space>b  :<C-u>CocList --number-select buffers<cr>
 
+" navigate chunks of current buffer
+nmap [G <Plug>(coc-git-prevchunk)
+nmap ]G <Plug>(coc-git-nextchunk)
+" navigate conflicts of current buffer
+nmap [c <Plug>(coc-git-prevconflict)
+nmap ]c <Plug>(coc-git-nextconflict)
+" show chunk diff at current position
+nmap gs <Plug>(coc-git-chunkinfo)
+" show commit contains current position
+nmap gc <Plug>(coc-git-commit)
+" create text object for git chunks
+omap ig <Plug>(coc-git-chunk-inner)
+xmap ig <Plug>(coc-git-chunk-inner)
+omap ag <Plug>(coc-git-chunk-outer)
+xmap ag <Plug>(coc-git-chunk-outer)
 
-" カーソルを動かさなかった時にドキュメントを表示する
-" autocmd CursorHold * silent call <SID>show_documentation()
+nnoremap <silent> <space>g  :<C-u>CocList --normal gstatus<CR>
+
 
 
 imenu       COC(&C).入力補完<TAB>^@                         ^@
@@ -223,8 +240,19 @@ nnoremenu COC(&C).CocList\ CocNext<TAB><space>j       :<C-u>CocNext<CR>
 nnoremenu COC(&C).CocList\ CocPrev<TAB><space>k       :<C-u>CocPrev<CR>
 nnoremenu COC(&C).CocList\ CocListResume<TAB><space>p :<C-u>CocListResume<CR>
 
+nmenu   COC(&C).coc-git-prevchunk<TAB>[G      <Plug>(coc-git-prevchunk)
+nmenu   COC(&C).coc-git-nextchunk<TAB>]G      <Plug>(coc-git-nextchunk)
+nmenu   COC(&C).coc-git-prevconflict<TAB>[c   <Plug>(coc-git-prevconflict)
+nmenu   COC(&C).coc-git-nextconflict<TAB>]c   <Plug>(coc-git-nextconflict)
+nmenu   COC(&C).coc-git-chunkinfo<TAB>gs      <Plug>(coc-git-chunkinfo)
+nmenu   COC(&C).coc-git-commit<TAB>gc         <Plug>(coc-git-commit)
+omenu   COC(&C).coc-git-chunk-inner<TAB>ig    <Plug>(coc-git-chunk-inner)
+xmenu   COC(&C).coc-git-chunk-inner<TAB>ig    <Plug>(coc-git-chunk-inner)
+omenu   COC(&C).coc-git-chunk-outer<TAB>ag    <Plug>(coc-git-chunk-outer)
+xmenu   COC(&C).coc-git-chunk-outer<TAB>ag    <Plug>(coc-git-chunk-outer)
+nmenu   COC(&C).CocList\ --normal\ gstatus<TAB><space>g  :<C-u>CocList --normal gstatus<CR>
+nmenu   COC(&C).CocCommand\ git\.foldUnchanged<TAB>      :<C-u>CocCommand git.foldUnchanged<cr>
 
-nmap <leader>rf <Plug>(coc-refactor)
 
 let g:coc_data_home = expand('~/.local/share/coc')
 let g:coc_config_home = expand('~/vimfiles')
@@ -234,7 +262,8 @@ let g:coc_global_extensions = [
       \'coc-lists',
       \'coc-json',
       \'coc-yaml',
-      \'coc-tabnine'
+      \'coc-tabnine',
+      \'coc-git'
 \]
 
 
@@ -242,7 +271,6 @@ function! CocStatusDiagnostic() abort
     " 囲み文字(HackGen) ⊠⚠ⓘ 💡 ⊕⊖⊗⊘⊙⊝ ☑☒ ◐◑◒◓ ❯ 
     " ░▒▓
     " ▖▗▘▙▚▛▜▝▞▟
-    " ambiwidth ⎇
     let info = get(b:, 'coc_diagnostic_info', {})
     if empty(info) | return '' | endif
     let msgs = []
@@ -252,5 +280,13 @@ function! CocStatusDiagnostic() abort
     if get(info, 'warning', 0)
         call add(msgs, '⚠' . info['warning'])
     endif
-    return join(msgs, ' ') . ' ' . get(g:, 'coc_status', '') . get(b:,'coc_current_function','')
+    " call add(msgs, get(g:,'coc_status', ''))
+    " call add(msgs, get(b:,'coc_current_function',''))
+    " call add(msgs, get(g:,'coc_git_status',''))
+    " call add(msgs, get(b:,'coc_git_status',''))
+    " call add(msgs, get(b:,'coc_git_blame',''))
+    return join(msgs, ' ')
 endfunction
+
+
+high DiffDelete guifg=tomato
