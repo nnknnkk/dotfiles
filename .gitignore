@@ -1,0 +1,14 @@
+### all ignore ###
+/*
+/.**
+
+### not ignore ###
+!/.gitignore
+!/.vimrc
+!/.gvimrc
+!/vimfiles
+!/vimfiles/vimconf/*
+!/vimfiles/*/
+/vimfiles/autoload/plug.vim
+/vimfiles/pack/packages/start/kaoriya/plugin/hz_ja.vim
+
