@@ -147,7 +147,7 @@ set statusline+=%=
 " endif
 set statusline+=\ %{get(g:,'coc_git_status','')}
 set statusline+=\ %r%h%w%y\ %12(行%-04.4l\ 列%-03v%)\ %{(&fenc!=''?&fenc:&enc).((&bomb)?'^':'\ ').&ff}
-set statusline^=%{CocStatusDiagnostic()}
+set statusline^=%#Search#%{CocStatusDiagnostic()}%*\ 
 
 " SKK利用時(ALE)
 " ~/.vimrc [+][RO] (VIM:cp932+unix) B:1  [SKK:あ] 0x82A0:あ  100:20 30%
@@ -241,7 +241,9 @@ tnoremap <S-ins> <C-w>"+
 " nnoremap <F2> <ESC>i<C-R>=strftime("[%Y.%m.%d %a %H:%M]")<CR><ESC>
 " nnoremap <F3> <ESC>i<C-R>=strftime("%H:%M")<CR><ESC>
 
-" VSCode風の補完 set completeopt=menuone,noinsert との組合せ
+" 補完をVSCode風にする(補完表示時のEnterで改行をしない等)
+" set completeopt=menuone,noinsert との組合せ
+inoremap <expr><TAB>   pumvisible() ? "\<C-y>"  : "\<TAB>"
 inoremap <expr><CR>    pumvisible() ? "\<C-y>"  : "\<CR>"
 inoremap <expr><C-n>   pumvisible() ? "\<Down>" : "\<C-n>"
 inoremap <expr><C-p>   pumvisible() ? "\<Up>"   : "\<C-p>"
@@ -720,6 +722,9 @@ Plug 'skanehira/translate.vim'
 " 置換プレビュー
 Plug 'markonm/traces.vim'
 
+" ターミナルにコードを送信する
+Plug 'jpalardy/vim-slime'
+
 call plug#end()
 
 " 分割した設定ファイル
@@ -831,6 +836,7 @@ nmap s/ <Plug>(easymotion-sn)
 xmap s/ <Plug>(easymotion-sn)
 omap s/ <Plug>(easymotion-tn)
 nmap ss <Plug>(easymotion-overwin-f2)
+nmap S  <Plug>(easymotion-overwin-f2)
 nmap sl <Plug>(easymotion-overwin-line)
 " bd=Bidirectional w=wordの先頭 e=wordの末尾
 " 検索系f2/sn/tn
@@ -896,10 +902,26 @@ amenu   Misc(&M).下にカーソルを追加<TAB>^↓ <nop>
 " operator-camelize
 " map scc <Plug>(operator-camelize-toggle)
 let g:caser_prefix = 'sc'
-amenu   Misc(&M).キャメルケース scc
-amenu   Misc(&M).スネークケース sc_
-amenu   Misc(&M).パスカルケース scp
-amenu   Misc(&M).ケバブケース   sck
+amenu   Misc(&M).キャメルケース<TAB>scc  scc
+amenu   Misc(&M).スネークケース<TAB>sc_  sc_
+amenu   Misc(&M).パスカルケース<TAB>scp  scp
+amenu   Misc(&M).ケバブケース<TAB>sck    sck
+
+
+" vim-slime
+if has('nvim')
+    let g:slime_target = "neovim"
+else
+    let g:slime_target = "vimterminal"
+endif
+let g:slime_python_ipython = 1
+" ipythonでのペーストがうまくいかない
+"  ~\.local\share\plugged\vim-slime\ftplugin\python\slime.vim
+"   return ["%cpaste -q", "\n", g:slime_dispatch_ipython_pause, a:text, "--", "\n"]
+"   return [substitute(dedented_lines, add_eol_pat, "", "g"), "\n"]
+" ^c^cipythonで起動した場合、初回のペーストは失敗する
+amenu   Misc(&M).ターミナルに送信<TAB>^c^c  ^c^c
+
 
 " vim-sayonara
 let g:sayonara_confirm_quit = 1

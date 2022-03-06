@@ -31,11 +31,11 @@ endif
 " Use tab for trigger completion with characters ahead and navigate.
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config.
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+" inoremap <silent><expr> <TAB>
+"       \ pumvisible() ? "\<C-n>" :
+"       \ <SID>check_back_space() ? "\<TAB>" :
+"       \ coc#refresh()
+" inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
 function! s:check_back_space() abort
   let col = col('.') - 1
@@ -82,7 +82,7 @@ endfunction
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
 " Symbol renaming.
-nmap <leader>rn <Plug>(coc-rename)
+nmap sn <Plug>(coc-rename)
 
 " Formatting selected code.
 xmap <leader>f  <Plug>(coc-format-selected)
@@ -206,7 +206,7 @@ nmenu       COC(&C).coc-references<TAB>gr                   <Plug>(coc-reference
 nmenu       COC(&C).coc-references-used<TAB>                <Plug>(coc-references-used)
 nnoremenu   COC(&C).ドキュメント表示<TAB>K                  <Cmd>call <SID>show_documentation()<CR>
 
-nmenu       COC(&C).coc-rename<TAB><leader>rn               <Plug>(coc-rename)
+nmenu       COC(&C).coc-rename<TAB>sn                       <Plug>(coc-rename)
 nmenu       COC(&C).coc-command-repeat<TAB>                 <Plug>(coc-command-repeat)
 
 xmenu       COC(&C).coc-format<TAB>                         <Plug>(coc-format)
@@ -289,4 +289,7 @@ function! CocStatusDiagnostic() abort
 endfunction
 
 
-high DiffDelete guifg=tomato
+highlight DiffDelete guifg=tomato
+highlight CocErrorFloat guifg=tomato
+" highlight CocWarningFloat
+" highlight CocHintFloat
