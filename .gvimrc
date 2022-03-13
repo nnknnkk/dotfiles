@@ -30,8 +30,10 @@ set signcolumn=yes
 set guioptions=cmgt!
 set foldcolumn=1
 
-colorscheme codedark
+" colorscheme codedark
 " colorscheme torte-cs
+colorscheme iceberg
+set background=light
 
 " 現在のタブに下線を引く
 highlight TabLineSel gui=underline

@@ -26,7 +26,10 @@ scriptencoding utf-8
 " ======= コンソール端末のカラースキーム ======= {{{
 if !has('gui_running')
     " colorscheme desert-cs
-    autocmd VimEnter * colorscheme codedark
+    " autocmd VimEnter * colorscheme codedark
+    " autocmd VimEnter * set background=dark
+    " autocmd VimEnter * colorscheme iceberg
+    colorscheme iceberg
 endif
 " ======= }}}
 
@@ -70,7 +73,7 @@ set softtabstop=4
 set smarttab
 set shiftwidth=4
 set shiftround
- 
+
 set autoindent
 set smartindent
 "set columns=100
@@ -113,6 +116,9 @@ endif
 let g:markdown_fenced_languages = ['javascript','python','json']
 let g:markdown_enable_conceal = 0
 
+" JavaScriptのカラースキーム
+autocmd FileType javascript setf typescript
+
 " 香り屋じゃない時用
 if ! has('kaoriya')
     " syntax enable
@@ -136,7 +142,6 @@ endif
 
 " ======= ステータスライン ======= {{{
 "
-" set statusline=%<%#Search#%f%*\ B:%n%=\ u+%B\ %{SkkGetModeStr()}\ %m%r%h%w\ %12(行%-04.4l\ 列%-03v%)\ %{(&fenc!=''?&fenc:&enc).((&bomb)?'^':'\ ').&ff}
 set statusline=%<%f%*\ %M\ B:%n
 set statusline+=\ %{SkkGetModeStr()}
 set statusline+=%=
@@ -148,6 +153,8 @@ set statusline+=%=
 set statusline+=\ %{get(g:,'coc_git_status','')}
 set statusline+=\ %r%h%w%y\ %12(行%-04.4l\ 列%-03v%)\ %{(&fenc!=''?&fenc:&enc).((&bomb)?'^':'\ ').&ff}
 set statusline^=%#Search#%{CocStatusDiagnostic()}%*\ 
+
+" 以前使用していたステータスライン {{{
 
 " SKK利用時(ALE)
 " ~/.vimrc [+][RO] (VIM:cp932+unix) B:1  [SKK:あ] 0x82A0:あ  100:20 30%
@@ -173,6 +180,7 @@ set statusline^=%#Search#%{CocStatusDiagnostic()}%*\
 " echo matchstr(strpart(getline(line(".")),col(".")\ -\ 1,2),'.')
 " echo matchstr(getline(line('.')),'.',col('.')-1)
 " echo matchstr(getline('.'),'.',col('.')-1)
+" }}}
 
 " ======= }}}
 
@@ -218,6 +226,7 @@ nnoremap Q <NOP>
 vnoremap Q <NOP>
 onoremap Q <NOP>
 
+inoremap <C-l> <Right>
 " ウィンドウを閉じないbd
 " command! BClose :bprevious<bar>split<bar>bnext<bar>bd
 " command! BClose :enew<bar>bd#
@@ -229,7 +238,7 @@ vnoremap gy "+y
 augroup vimrc
 	autocmd!
 	autocmd VimEnter * nmap <S-ins> "*]p
-	autocmd VimEnter * imap <S-ins> "*]p
+	autocmd VimEnter * imap <S-ins> <C-r><C-o>*
 augroup END
 " nnoremap ga :silent !start <cfile><cr>
 " ターミナル
@@ -305,7 +314,7 @@ autocmd CursorHold * call AutoUpdate()
 "     endif
 "     if !bufexists( dist_path )
 "         let result = rename( current_path, dist_path )
-"         if result == 0 
+"         if result == 0
 "             silent exe "file " . dist_path
 "             echo "移動に成功しました(" . expand("%:t") . ")\n"
 "             return
@@ -345,7 +354,7 @@ autocmd CursorHold * call AutoUpdate()
 "         echo "削除に成功しました: " . target_buffer_name
 "         silent exe "bnext"
 "         silent exe "bd " . target_buffer_no
-"     else 
+"     else
 "         echo "削除に失敗しました(返り値:" . result . "): " . target_buffer_name
 "     end
 " endfunction
@@ -385,7 +394,7 @@ if has('kaoriya')
         if &transparency != 255
             " set guioptions-=C
             execute 'set transparency=' . 255
-            set laststatus=2      
+            set laststatus=2
             set nonumber
             set list
             set nowrap
@@ -430,7 +439,7 @@ endif
 " :rubyfile file    " = :ruby load 'file'
 "
 " テキストオブジェクト(visualモードでの範囲選択やmotionのかわりに使う)
-" 
+"
 " at                " tag block   タグの内外( <a> ... </a> )
 " it                " tag block   タグの内側(     ...      )
 " aw                " a word
@@ -510,11 +519,14 @@ endif
 
 " ======= Quick-Scope ======= {{{
 let g:qs_lazy_highligh=1
-augroup qs_colors
-  autocmd!
-  autocmd ColorScheme * highlight QuickScopePrimary guifg='#afff5f' gui=underline ctermfg=155 cterm=underline
-  autocmd ColorScheme * highlight QuickScopeSecondary guifg='#5fffff' gui=underline ctermfg=81 cterm=underline
-augroup END
+function s:QuickScopeHighlight() abort
+    augroup qs_colors
+        autocmd!
+        highlight QuickScopePrimary gui=underline,bold cterm=underline,bold
+        highlight QuickScopeSecondary gui=undercurl,bold cterm=undercurl,bold
+    augroup END
+endfunction
+autocmd ColorScheme * call s:QuickScopeHighlight()
 " ======= }}}
 
 " ======= vim-lsp asyncomplete(不使用) ======= {{{
@@ -620,7 +632,7 @@ augroup END
 
 " ======= プラグイン管理(vim-plug) ================= {{{
 " 自動インストール
-let s:vim_plug_path = '~/vimfiles/autoload/plug.vim'
+let s:vim_plug_path = expand('~/vimfiles/autoload/plug.vim')
 if empty(glob(s:vim_plug_path))
     echo "vim-plugを配置します"
     silent execute '!curl -fLo '.s:vim_plug_path.' --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
@@ -640,19 +652,19 @@ Plug 'vim-skk/skk.vim'
 " Plug 'vim-skk/denops-skkeleton.vim'
 
 
-" colorscheme codedark
+" colorscheme
 Plug 'tomasiser/vim-code-dark'
+Plug 'cocopon/iceberg.vim'
 
 
 " surround
 " Plug 'tpope/vim-surround'
-" Plug 'tpope/vim-repeat'
 Plug 'machakann/vim-sandwich'
 
 " filer(renamer)
 Plug 'justinmk/vim-dirvish'
 
-" 
+
 " Plug 'ctrlpvim/ctrlp.vim'
 
 " ==============
@@ -673,7 +685,7 @@ Plug 'chrisbra/csv.vim'
 " SonicTemplate  Postfix Code Completion
 " Plug 'mattn/sonictemplate-vim'
 
-" 選択範囲の拡張 + - 
+" 選択範囲の拡張 + -
 Plug 'terryma/vim-expand-region'
 
 " f/F/t/Tで動ける文字の強調
@@ -695,6 +707,8 @@ Plug 'lifepillar/vim-zeef'
 " Plug 'mattn/vim-lsp-settings'
 " Plug 'mattn/vim-lsp-icons'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
+" 'for': ['python', 'javascript', 'typescript', 'json', 'yaml', 'html'],
 
 " 非同期補完
 " Plug 'prabirshrestha/asyncomplete.vim'
@@ -702,6 +716,7 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 " モーション
 Plug 'easymotion/vim-easymotion'
+Plug 'tpope/vim-repeat'
 " Plug 'hrsh7th/vim-searchx'
 " Plug 'justinmk/vim-sneak'
 
@@ -727,8 +742,18 @@ Plug 'jpalardy/vim-slime'
 
 call plug#end()
 
+" 遅延読み込み {{{
+" augroup load_us_hold
+"     autocmd!
+"     autocmd CursorHold * call plug#load(
+"                 \ 'vim-easymotion',
+"                 \ )| autocmd! load_us_hold
+" augroup END
+" }}}
+
 " 分割した設定ファイル
 let s:config_dir = expand('~/dotfiles/vimconf/')
+execute 'source '.s:config_dir.'coc.vim'
 
 " ======= }}}
 
@@ -739,7 +764,6 @@ execute 'source '.s:config_dir.'skkvim.vim'
 " source ~/.eskkvim
 " source ~/.skkeletonvim
 " ======= }}}
-
 
 " ======= fzf(不使用) ========== {{{
 " let $FZF_DEFAULT_OPTS = '--reverse --bind=alt-a:toggle-all --bind=change:clear-screen'
@@ -813,31 +837,36 @@ anoremenu   囲み(&S).operator-replaceのヘルプ                     :h   ope
 
 " ======= }}}
 
-" ======= CoC CocList ======= {{{
-execute 'source '.s:config_dir.'coc.vim'
-
-
-" ======= }}}
-
 " ======= Misc EasyMotion vim-visual-multi ======= {{{
-" EasyMotion
+
+" EasyMotion {{{
 let g:EasyMotion_do_mapping = 0
 " let g:EasyMotion_use_migemo = 1
 let g:EasyMotion_smartcase = 1
 let g:EasyMotion_startofline = 0
 let g:EasyMotion_enter_jump_first = 1
 let g:EasyMotion_space_jump_first = 1
-let g:EasyMotion_prompt = '{n} 貼付(^v) 補完(^l/^r^w/^r^a/^r^f) 下向(tab) 展開(^z) 戻る(^o): '
+" let g:EasyMotion_prompt = '{n} 貼付(^v) 補完(^l/^r^w/^r^a/^r^f) 下向(tab) 展開(^z) 戻る(^o): '
 autocmd User EasyMotionPromptBegin silent! CocDisable
 autocmd User EasyMotionPromptEnd   silent! CocEnable
 autocmd VimEnter * EMCommandLineNoreMap ; <CR>
 autocmd VimEnter * EMCommandLineNoreMap <Space> <CR>
+function s:EasyMotionHighligh() abort
+    highlight EasyMotionTarget gui=bold
+    if &background=='light'
+        highlight EasyMotionTarget guifg=#cc517a
+    endif
+endfunction
+autocmd colorscheme * call s:EasyMotionHighligh()
 nmap s/ <Plug>(easymotion-sn)
 xmap s/ <Plug>(easymotion-sn)
 omap s/ <Plug>(easymotion-tn)
 nmap ss <Plug>(easymotion-overwin-f2)
-nmap S  <Plug>(easymotion-overwin-f2)
-nmap sl <Plug>(easymotion-overwin-line)
+xmap ss <Plug>(easymotion-overwin-f2)
+omap ss <Plug>(easymotion-overwin-f2)
+nmap S  <Plug>(easymotion-overwin-f)
+xmap S  <Plug>(easymotion-overwin-f)
+omap S  <Plug>(easymotion-overwin-f)
 " bd=Bidirectional w=wordの先頭 e=wordの末尾
 " 検索系f2/sn/tn
 " <C-;>はvimでは使用できない
@@ -881,8 +910,9 @@ amenu   Misc(&M).easymotion.easymotion-k<TAB>                <Plug>(easymotion-k
 amenu   Misc(&M).easymotion.easymotion-iskeyword-bd-w<TAB>   <Plug>(easymotion-iskeyword-bd-w)
 amenu   Misc(&M).easymotion.easymotion-iskeyword-bd-e<TAB>   <Plug>(easymotion-iskeyword-bd-e)
 amenu   Misc(&M).easymotion.easymotion-jumptoanywhere<TAB>   <Plug>(easymotion-jumptoanywhere)
+" }}}
 
-" vim-visual-multi
+" vim-visual-multi {{{
 amenu   Misc(&M).カーソル位置の単語でマルチカーソル<TAB>^n ^n
 amenu   Misc(&M).上にカーソルを追加<TAB>^↑ <nop>
 amenu   Misc(&M).下にカーソルを追加<TAB>^↓ <nop>
@@ -898,17 +928,18 @@ amenu   Misc(&M).下にカーソルを追加<TAB>^↓ <nop>
 " \\@   マクロを適用する
 " \\z   :normal
 " \\x   ex
+" }}}
 
-" operator-camelize
+" operator-camelize {{{
 " map scc <Plug>(operator-camelize-toggle)
 let g:caser_prefix = 'sc'
 amenu   Misc(&M).キャメルケース<TAB>scc  scc
 amenu   Misc(&M).スネークケース<TAB>sc_  sc_
 amenu   Misc(&M).パスカルケース<TAB>scp  scp
 amenu   Misc(&M).ケバブケース<TAB>sck    sck
+" }}}
 
-
-" vim-slime
+" vim-slime {{{
 if has('nvim')
     let g:slime_target = "neovim"
 else
@@ -921,27 +952,29 @@ let g:slime_python_ipython = 1
 "   return [substitute(dedented_lines, add_eol_pat, "", "g"), "\n"]
 " ^c^cipythonで起動した場合、初回のペーストは失敗する
 amenu   Misc(&M).ターミナルに送信<TAB>^c^c  ^c^c
+" }}}
 
-
-" vim-sayonara
+" vim-sayonara {{{
 let g:sayonara_confirm_quit = 1
 command! BD Sayonara!
+" }}}
 
-"<C-@> で :terminal もしくは Terminal ウィンドウにジャンプ
+" <C-@> で :terminal もしくは Terminal ウィンドウにジャンプ {{{
 if has('terminal')
-  nnoremap <silent><expr> <C-@> <SID>switch_to_terminal(get(term_list(), 0, v:null))
-  tnoremap <silent><expr> <C-@> <SID>switch_to_window()
-  function! s:switch_to_terminal(nr) abort
-    return a:nr == v:null || term_getstatus(a:nr) =~# 'finished'
-          \ ? ":\<C-u>terminal\<CR>"
-          \ : bufwinnr(a:nr) . "\<C-w>w"
-  endfunction
-  function! s:switch_to_window() abort
-    return (empty(&termwinkey) ? "\<C-w>" : &termwinkey) . "\<C-w>"
-  endfunction
+    nnoremap <silent><expr> <C-@> <SID>switch_to_terminal(get(term_list(), 0, v:null))
+    tnoremap <silent><expr> <C-@> <SID>switch_to_window()
+    function! s:switch_to_terminal(nr) abort
+        return a:nr == v:null || term_getstatus(a:nr) =~# 'finished'
+                    \ ? ":\<C-u>terminal\<CR>"
+                    \ : bufwinnr(a:nr) . "\<C-w>w"
+    endfunction
+    function! s:switch_to_window() abort
+        return (empty(&termwinkey) ? "\<C-w>" : &termwinkey) . "\<C-w>"
+    endfunction
 endif
+" }}}  
 
-" Popup Windowの翻訳
+" Popup Windowの翻訳 {{{
 function! s:GetPopUpText() abort
     " call popup_create('foobar1', {})
     " call popup_create('foobar2', {})
@@ -965,7 +998,60 @@ command! -nargs=0 Ptranslate call s:Ptranslate()
 vmap \tt <Plug>(VTranslate)
 nmap \tp :<C-u>Ptranslate<CR>
 nnoremap \y  :call <SID>GetPopUpText()->setreg("")
+" }}}
 
+" 行末スペース、行末タブの表示 {{{
+highlight TrailingSpaces gui=undercurl guisp=red
+match TrailingSpaces /\s\{-1,}$/
+" au BufNew,BufRead * call matchadd('TrailingSpaces', '\s\{-1,}$')
+" }}}
+
+" 不要なプラグインを読み込まない {{{
+let g:did_install_default_menus = 1
+let g:did_install_syntax_menu   = 1
+let g:did_indent_on             = 1
+let g:did_load_filetypes        = 1
+let g:did_load_ftplugin         = 1
+let g:loaded_2html_plugin       = 1
+let g:loaded_gzip               = 1
+let g:loaded_man                = 1
+let g:loaded_matchit            = 1
+let g:loaded_matchparen         = 1
+let g:loaded_netrwPlugin        = 1
+let g:loaded_remote_plugins     = 1
+let g:loaded_shada_plugin       = 1
+let g:loaded_spellfile_plugin   = 1
+let g:loaded_tarPlugin          = 1
+let g:loaded_tutor_mode_plugin  = 1
+let g:loaded_zipPlugin          = 1
+let g:skip_loading_mswin        = 1
+let g:did_install_default_menus = 1
+let g:did_install_syntax_menu   = 1
+let g:did_indent_on             = 1
+let g:did_load_filetypes        = 1
+let g:did_load_ftplugin         = 1
+let g:loaded_2html_plugin       = 1
+let g:loaded_gzip               = 1
+let g:loaded_man                = 1
+let g:loaded_matchit            = 1
+let g:loaded_matchparen         = 1
+let g:loaded_netrwPlugin        = 1
+let g:loaded_remote_plugins     = 1
+let g:loaded_shada_plugin       = 1
+let g:loaded_spellfile_plugin   = 1
+let g:loaded_tarPlugin          = 1
+let g:loaded_tutor_mode_plugin  = 1
+let g:loaded_zipPlugin          = 1
+" 香り屋
+let g:skip_loading_mswin        = 1
+let g:plugin_autodate_disable   = 1
+let g:plugin_cmdex_disable      = 1
+let g:plugin_dicwin_disable     = 1
+let g:plugin_hz_ja_disable      = 0
+let g:plugin_scrnmode_disable   = 1
+let g:plugin_verifyenc_disable  = 1
+
+" }}}
 
 " ======= }}}
 

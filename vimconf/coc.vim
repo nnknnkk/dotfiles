@@ -285,11 +285,28 @@ function! CocStatusDiagnostic() abort
     " call add(msgs, get(g:,'coc_git_status',''))
     " call add(msgs, get(b:,'coc_git_status',''))
     " call add(msgs, get(b:,'coc_git_blame',''))
-    return join(msgs, ' ')
+    return join(msgs, '')
 endfunction
 
 
-highlight DiffDelete guifg=tomato
-highlight CocErrorFloat guifg=tomato
-" highlight CocWarningFloat
-" highlight CocHintFloat
+function s:CustomizeColor() abort
+    if get(g:, 'colors_name', '') == 'iceberg'
+        if &background == 'light'
+            highlight CocErrorSign     guibg=#dcdfe7 guifg=#cc517a
+            highlight CocWarningSign   guibg=#dcdfe7 guifg=#c57339
+            highlight CocInfoSign      guibg=#dcdfe7 guifg=#3f83a6
+            highlight CocHintSign      guibg=#dcdfe7 guifg=#a5b0d3
+        elseif &background == 'dark'
+            highlight CocErrorSign     guibg=#1e2332 guifg=#cc517a
+            highlight CocWarningSign   guibg=#1e2332 guifg=#c57339
+            highlight CocInfoSign      guibg=#1e2332 guifg=#3f83a6
+            highlight CocHintSign      guibg=#1e2332 guifg=#444b71
+        endif
+        highlight FgCocErrorFloatBgCocFloating   guifg=#e27878
+        highlight FgCocWarningFloatBgCocFloating guifg=#c57339
+        highlight FgCocInfoFloatBgCocFloating    guifg=#3f83a6
+        highlight FgCocHintFloatBgCocFloating    guifg=#8389a3
+    endif
+endfunction
+autocmd ColorScheme * call s:CustomizeColor()
+
