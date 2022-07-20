@@ -24,7 +24,7 @@ scriptencoding utf-8
 " ======= }}}
 
 " ======= コンソール端末のカラースキーム ======= {{{
-if !has('gui_running')
+if !has('gui_running') && !exists('g:vscode')
     " colorscheme desert-cs
     " autocmd VimEnter * colorscheme codedark
     " autocmd VimEnter * set background=dark
@@ -37,7 +37,7 @@ endif
 
 set viminfo=
 " set viminfo=c,h,'0,<0,f0
-" set viminfo=c,h,'0,<0,f0,n~/.cache/vim/viminfo
+set viminfo=c,h,'0,<0,f0,n~/.cache/vim/viminfo
 set nobackup
 set directory=$TEMP,.
 set undodir=$TEMP,.
@@ -150,9 +150,13 @@ set statusline+=%=
 " else
 "     set statusline+=\ 0x%B
 " endif
-set statusline+=\ %{get(g:,'coc_git_status','')}
+if exists('g:coc_enabled')
+    set statusline+=\ %{get(g:,'coc_git_status','')}
+endif
 set statusline+=\ %r%h%w%y\ %12(行%-04.4l\ 列%-03v%)\ %{(&fenc!=''?&fenc:&enc).((&bomb)?'^':'\ ').&ff}
-set statusline^=%#Search#%{CocStatusDiagnostic()}%*\ 
+if exists('g:coc_enabled')
+    set statusline^=%#Search#%{CocStatusDiagnostic()}%*\ 
+endif
 
 " 以前使用していたステータスライン {{{
 
@@ -639,6 +643,10 @@ if empty(glob(s:vim_plug_path))
     autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
+function! Cond(Cond, ...)
+  let opts = get(a:000, 0, {})
+  return a:Cond ? opts : extend(opts, { 'on': [], 'for': [] })
+endfunction
 
 call plug#begin('~/.local/share/plugged')
 
@@ -646,7 +654,7 @@ call plug#begin('~/.local/share/plugged')
 Plug 'vim-jp/vimdoc-ja'
 
 " SKK
-Plug 'vim-skk/skk.vim'
+Plug 'vim-skk/skk.vim', Cond(!exists('g:vscode'))
 " Plug 'vim-skk/eskk.vim'
 " Plug 'vim-denops/denops.vim'
 " Plug 'vim-skk/denops-skkeleton.vim'
@@ -689,7 +697,7 @@ Plug 'chrisbra/csv.vim'
 Plug 'terryma/vim-expand-region'
 
 " f/F/t/Tで動ける文字の強調
-Plug 'unblevable/quick-scope'
+" Plug 'unblevable/quick-scope'
 
 " messageをキャプチャする (例1):Capture scriptnames (例2):Capture !dir
 Plug 'tyru/capture.vim'
@@ -706,16 +714,18 @@ Plug 'lifepillar/vim-zeef'
 " Plug 'prabirshrestha/vim-lsp'
 " Plug 'mattn/vim-lsp-settings'
 " Plug 'mattn/vim-lsp-icons'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-" Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
-" 'for': ['python', 'javascript', 'typescript', 'json', 'yaml', 'html'],
+
+" Plug 'neoclide/coc.nvim', Cond(!exists('g:vscode'), {'branch': 'release'})
+" " Plug 'neoclide/coc.nvim', {'branch': 'release', 'on': []}
+" " 'for': ['python', 'javascript', 'typescript', 'json', 'yaml', 'html'],
 
 " 非同期補完
 " Plug 'prabirshrestha/asyncomplete.vim'
 " Plug 'prabirshrestha/asyncomplete-lsp.vim'
 
 " モーション
-Plug 'easymotion/vim-easymotion'
+Plug 'easymotion/vim-easymotion', Cond(!exists('g:vscode'))
+Plug 'asvetliakov/vim-easymotion', Cond(exists('g:vscode'), { 'as': 'vsc-easymotion' })
 Plug 'tpope/vim-repeat'
 " Plug 'hrsh7th/vim-searchx'
 " Plug 'justinmk/vim-sneak'
@@ -753,7 +763,9 @@ call plug#end()
 
 " 分割した設定ファイル
 let s:config_dir = expand('~/dotfiles/vimconf/')
-execute 'source '.s:config_dir.'coc.vim'
+if !exists('g:vscode') && exists('g:coc_enabled')
+    execute 'source '.s:config_dir.'coc.vim'
+endif
 
 " ======= }}}
 
@@ -763,6 +775,9 @@ execute 'source '.s:config_dir.'coc.vim'
 execute 'source '.s:config_dir.'skkvim.vim'
 " source ~/.eskkvim
 " source ~/.skkeletonvim
+if exists('g:vscode')
+    set imdisable
+endif
 " ======= }}}
 
 " ======= fzf(不使用) ========== {{{
@@ -1047,7 +1062,7 @@ let g:skip_loading_mswin        = 1
 let g:plugin_autodate_disable   = 1
 let g:plugin_cmdex_disable      = 1
 let g:plugin_dicwin_disable     = 1
-let g:plugin_hz_ja_disable      = 0
+" let g:plugin_hz_ja_disable    = 0 " 変数名が存在すると無効
 let g:plugin_scrnmode_disable   = 1
 let g:plugin_verifyenc_disable  = 1
 
