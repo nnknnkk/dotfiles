@@ -1,4 +1,4 @@
-" vim: set foldmethod=marker:
+" vim: set foldmethod=marker fenc=utf-8:
 " ======= internal encoding ======= {{{
 if has('windows') && !has('nvim') && !has('gui_running')
 " windows gvim cmd.exe no-windows-terminal
@@ -829,8 +829,8 @@ autocmd colorscheme * call s:EasyMotionHighligh()
 " xmap S  <Plug>(easymotion-overwin-f)
 " omap S  <Plug>(easymotion-overwin-f)
 nmap <c-k> <Plug>(easymotion-overwin-f2)
-xmap <c-k> <Plug>(easymotion-overwin-f2)
-omap <c-k> <Plug>(easymotion-overwin-f2)
+xmap <c-k> <Plug>(easymotion-bd-f2)
+omap <c-k> <Plug>(easymotion-bd-f2)
 " bd=Bidirectional w=wordの先頭 e=wordの末尾
 " 検索系f2/sn/tn
 " <C-;>はvimでは使用できない
